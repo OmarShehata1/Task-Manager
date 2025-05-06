@@ -1,24 +1,50 @@
 const Task = require("../models/taskModel");
 
 const getAllTasks = async (req, res) => {
-  res.send("get all tasks");
+  const tasks = await Task.find({});
+  res.status(200).json({
+    tasks,
+    amount: tasks.length,
+  });
 };
 
 const getTask = async (req, res) => {
-  res.send("get task");
+  const id = req.params.id;
+  const task = await Task.findById(id);
+  if (!task) {
+    return res.status(404).json({ msg: "Not found" });
+  }
+  res.status(200).json({ task });
 };
 
 const createTask = async (req, res) => {
-  res.send("create task");
+  const task = req.body;
+  const newTask = await Task.create(task);
+  res.status(201).json({
+    task: newTask,
+  });
 };
 
 const updateTask = async (req, res) => {
-  res.send("update task");
+  const id = req.params.id;
+  const task = await Task.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!task) {
+    return res.status(404).json({ msg: "Not found" });
+  }
+  res.status(200).json({ task });
 };
 
 const deleteTask = async (req, res) => {
-  res.send("delete task");
-};
+  const id = req.params.id;
+  const task = await Task.findByIdAndDelete(id);
+  if (!task) {
+    return res.status(404).json({ msg: "Not found" });
+  }
+  res.status(200).json({ task: null, status: "success" });
+}
 
 module.exports = {
   getAllTasks,
